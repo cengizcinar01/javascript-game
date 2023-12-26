@@ -22,14 +22,24 @@ class Raven {
         this.markedForDeletion = false;
         this.image = new Image();
         this.image.src = 'raven.png';
+        this.frame = 0;
+        this.maxFrame = 4;
+        this.timeSinceFlap = 0;
+        this.flapInterval = 100;
     }
-    update() {
+    update(deltatime) {
         this.x -= this.directionX;
         if (this.x < 0 - this.width) this.markedForDeletion = true;
+        this.timeSinceFlap += deltatime;
+        if (this.timeSinceFlap > this.flapInterval) {
+            if (this.frame > this.maxFrame) this.frame = 0;
+            else this.frame++;
+            this.timeSinceFlap = 0;
+        }
     }
     draw() {
         ctx.strokeRect(this.x, this.y, this.width, this.height);
-        ctx.drawImage(this.image, 0, 0, this.spriteWidth, this.spriteHeight, this.x, this.y, this.width, this.height);
+        ctx.drawImage(this.image, this.frame * this.spriteWidth, 0, this.spriteWidth, this.spriteHeight, this.x, this.y, this.width, this.height);
     }
 }
 
@@ -42,7 +52,7 @@ function animate(timestamp) {
         ravens.push(new Raven());
         timeToNextRaven = 0;
     }
-    [...ravens].forEach((object) => object.update());
+    [...ravens].forEach((object) => object.update(deltatime));
     [...ravens].forEach((object) => object.draw());
     ravens = ravens.filter((object) => !object.markedForDeletion);
     requestAnimationFrame(animate);
