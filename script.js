@@ -34,7 +34,7 @@ class Raven {
         if (this.timeSinceFlap > this.flapInterval) {
             if (this.frame > this.maxFrame) this.frame = 0;
             else this.frame++;
-            this.timeSinceFlap = 0;
+            this.timeSinceFlap = Math.random() * 50 + 50;
         }
     }
     draw() {
