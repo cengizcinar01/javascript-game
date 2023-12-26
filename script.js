@@ -37,6 +37,7 @@ class Raven {
         this.flapInterval = 100;
         this.randomColors = [Math.floor(Math.random() * 255), Math.floor(Math.random() * 255), Math.floor(Math.random() * 255)];
         this.color = 'rgb(' + this.randomColors[0] + ',' + this.randomColors[1] + ',' + this.randomColors[2] + ')';
+        this.hasTrail = Math.random() > 0.5;
     }
     update(deltatime) {
         if (this.y < 0 || this.y > canvas.height - this.height) {
@@ -50,7 +51,9 @@ class Raven {
             if (this.frame > this.maxFrame) this.frame = 0;
             else this.frame++;
             this.timeSinceFlap = 0;
-            particles.push(new Particle(this.x, this.y, this.width, this.color));
+            if (this.hasTrail) {
+                particles.push(new Particle(this.x, this.y, this.width, this.color));
+            }
         }
         if (this.x < 0 - this.width) gameOver = true;
     }
@@ -106,7 +109,7 @@ class Particle {
     }
     update() {
         this.x += this.speedX;
-        this.radius += 0.2;
+        this.radius += 0.5;
         if (this.radius > this.maxRadius) this.markedForDeletion = true;
     }
     draw() {
@@ -160,8 +163,8 @@ function animate(timestamp) {
         });
     }
     drawScore();
-    [...ravens, ...explosions, ...particles].forEach((object) => object.update(deltatime));
-    [...ravens, ...explosions, ...particles].forEach((object) => object.draw());
+    [...particles, ...ravens, ...explosions].forEach((object) => object.update(deltatime));
+    [...particles, ...ravens, ...explosions].forEach((object) => object.draw());
     ravens = ravens.filter((object) => !object.markedForDeletion);
     explosions = explosions.filter((object) => !object.markedForDeletion);
     particles = particles.filter((object) => !object.markedForDeletion);
