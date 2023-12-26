@@ -2,6 +2,12 @@ const canvas = document.getElementById('canvas1');
 const ctx = canvas.getContext('2d');
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
+
+const collisionCanvas = document.getElementById('collisionCanvas');
+const collisionCtx = collisionCanvas.getContext('2d');
+collisionCanvas.width = window.innerWidth;
+collisionCanvas.height = window.innerHeight;
+
 let score = 0;
 ctx.font = '50px Impact';
 
@@ -28,6 +34,8 @@ class Raven {
         this.maxFrame = 4;
         this.timeSinceFlap = 0;
         this.flapInterval = 100;
+        this.randomColors = [Math.floor(Math.random() * 255), Math.floor(Math.random() * 255), Math.floor(Math.random() * 255)];
+        this.color = 'rgb(' + this.randomColors[0] + ',' + this.randomColors[1] + ',' + this.randomColors[2] + ')';
     }
     update(deltatime) {
         if (this.y < 0 || this.y > canvas.height - this.height) {
@@ -44,7 +52,8 @@ class Raven {
         }
     }
     draw() {
-        ctx.strokeRect(this.x, this.y, this.width, this.height);
+        ctx.fillStyle = this.color;
+        ctx.fillRect(this.x, this.y, this.width, this.height);
         ctx.drawImage(this.image, this.frame * this.spriteWidth, 0, this.spriteWidth, this.spriteHeight, this.x, this.y, this.width, this.height);
     }
 }
@@ -56,6 +65,10 @@ function drawScore() {
     ctx.fillText('Score: ' + score, 55, 80);
 }
 
+window.addEventListener('click', function (e) {
+    const detectPixelColor = ctx.getImageData(e.x, e.y, 1, 1);
+});
+
 function animate(timestamp) {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     let deltatime = timestamp - lastTime;
@@ -64,6 +77,9 @@ function animate(timestamp) {
     if (timeToNextRaven > ravenInterval) {
         ravens.push(new Raven());
         timeToNextRaven = 0;
+        ravens.sort(function (a, b) {
+            return a.width - b.width;
+        });
     }
     drawScore();
     [...ravens].forEach((object) => object.update(deltatime));
